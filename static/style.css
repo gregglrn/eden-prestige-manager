@@ -215,3 +215,39 @@ font-weight:bold;
 color:#b58d2e;
 
 }
+
+.liste-clients{
+
+position:absolute;
+
+background:white;
+
+width:100%;
+
+border:1px solid #ddd;
+
+max-height:250px;
+
+overflow-y:auto;
+
+display:none;
+
+z-index:999;
+
+}
+
+.liste-clients div{
+
+padding:10px;
+
+cursor:pointer;
+
+}
+
+.liste-clients div:hover{
+
+background:#c7a44b;
+
+color:white;
+
+}

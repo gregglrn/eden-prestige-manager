@@ -29,7 +29,20 @@ href="{{ url_for('static', filename='style.css') }}">
 <h2>Informations client</h2>
 
 <label>Nom</label>
-<input id="nom" name="nom">
+<div class="position-relative">
+
+<input
+    id="nom"
+    name="nom"
+    autocomplete="off">
+
+<div
+    id="listeClients"
+    class="liste-clients">
+
+</div>
+
+</div>
 
 <div id="suggestions"></div>
 
@@ -134,18 +147,6 @@ onclick="ajouterLigne()">
 
 </button>
 
-<h2 style="text-align:right">
-
-Total :
-
-<span id="grandTotal">
-
-0.00 €
-
-</span>
-
-</h2>
-
 </div>
 
 <br>
@@ -166,7 +167,11 @@ value="Créer le devis">
 fetch("/api/prestations")
     .then(r => r.json())
     .then(data => {
+
         catalogue = data;
+
+        ajouterLigne();
+
     });
 
 let tbody = document.querySelector("#prestations tbody");
@@ -299,8 +304,6 @@ document
 .getElementById("remise")
 .addEventListener("input",calculer);
 
-ajouterLigne();
-
 let clients = [];
 
 fetch("/api/clients")
@@ -334,50 +337,58 @@ function selectionPrestation(select){
     calculer();
 }
 
-document.getElementById("nom").addEventListener("input",function(){
+document
+.getElementById("nom")
+.addEventListener("input", function () {
 
-    let valeur=this.value.toLowerCase();
+    const texte = this.value.toLowerCase();
 
-    let div=document.getElementById("suggestions");
+    const liste = document.getElementById("listeClients");
 
-    div.innerHTML="";
+    liste.innerHTML = "";
 
-    if(valeur.length<2)
+    if (texte.length < 2) {
+
+        liste.style.display = "none";
         return;
 
-    clients.forEach(function(c){
+    }
 
-        if(c.nom.toLowerCase().includes(valeur)){
+    const resultat = clients.filter(c =>
 
-            let ligne=document.createElement("div");
+        c.nom.toLowerCase().includes(texte)
 
-            ligne.className="suggestion";
+    );
 
-            ligne.innerHTML=c.nom;
+    resultat.forEach(client => {
 
-            ligne.onclick=function(){
+        let div = document.createElement("div");
 
-                document.getElementById("nom").value=c.nom;
+        div.innerHTML = client.nom;
 
-                document.getElementById("adresse").value=c.adresse;
+        div.onclick = function(){
 
-                document.getElementById("cp").value=c.cp;
+            document.getElementById("nom").value = client.nom;
 
-                document.getElementById("ville").value=c.ville;
+            document.getElementById("adresse").value = client.adresse;
 
-                document.getElementById("telephone").value=c.telephone;
+            document.getElementById("cp").value = client.cp;
 
-                document.getElementById("mail").value=c.email;
+            document.getElementById("ville").value = client.ville;
 
-                div.innerHTML="";
+            document.getElementById("telephone").value = client.telephone;
 
-            };
+            document.getElementById("mail").value = client.email;
 
-            div.appendChild(ligne);
+            liste.style.display = "none";
 
         }
 
+        liste.appendChild(div);
+
     });
+
+    liste.style.display = "block";
 
 });
 
