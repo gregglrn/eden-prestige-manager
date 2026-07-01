@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Eden Prestige Paysage</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>🌿 EDEN PRESTIGE</h2>
+
+<a href="/">🏠 Tableau de bord</a>
+
+<a href="/">📄 Nouveau devis</a>
+
+<a href="/clients">👤 Clients</a>
+
+<a href="#">📜 Historique</a>
+
+<a href="#">⚙ Paramètres</a>
+
+</div>
+
+<div class="content">
+
+<h1>Nouveau devis</h1>
+
+<form action="/devis" method="POST">
+
+<div class="bloc">
+
+<h2>Informations client</h2>
+
+<label>Nom</label>
+<input id="nom" name="nom">
+
+<div id="suggestions"></div>
+
+<label>Adresse</label>
+<input id="adresse" name="adresse_client">
+
+<label>Code postal</label>
+<input id="cp" name="cp">
+
+<label>Ville</label>
+<input id="ville" name="ville">
+
+<label>Téléphone</label>
+<input id="telephone" name="telephone">
+
+<label>Email</label>
+<input id="mail" name="mail">
+
+</div>
+
+<br>
+
+<div class="bloc">
+
+<h2>Prestations</h2>
+
+<table id="prestations">
+
+<thead>
+
+<tr>
+
+<th>Désignation</th>
+
+<th>Unité</th>
+
+<th>Qté</th>
+
+<th>Prix</th>
+
+<th>Total</th>
+
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+
+<br>
+
+<button
+type="button"
+onclick="ajouterLigne()">
+
+➕ Ajouter une ligne
+
+</button>
+
+<h2 style="text-align:right">
+
+Total :
+
+<span id="grandTotal">
+
+0.00 €
+
+</span>
+
+</h2>
+
+</div>
+
+<br>
+
+<input
+class="valider"
+type="submit"
+value="Créer le devis">
+
+</form>
+
+</div>
+
+<script>
+
+let tbody = document.querySelector("#prestations tbody");
+
+function ajouterLigne(){
+
+let ligne=document.createElement("tr");
+
+ligne.innerHTML=`
+
+<td><input name="designation[]"></td>
+
+<td><input name="unite[]"></td>
+
+<td><input type="number" value="1" name="quantite[]" oninput="calculer()"></td>
+
+<td><input type="number" value="0" step="0.01" name="prix[]" oninput="calculer()"></td>
+
+<td class="ligneTotal">0.00 €</td>
+
+<td><button type="button" onclick="supprimer(this)">❌</button></td>
+
+`;
+
+tbody.appendChild(ligne);
+
+calculer();
+
+}
+
+function supprimer(btn){
+
+btn.parentNode.parentNode.remove();
+
+calculer();
+
+}
+
+function calculer(){
+
+let total=0;
+
+document.querySelectorAll("#prestations tbody tr").forEach(function(row){
+
+let q=parseFloat(row.querySelector('input[name="quantite[]"]').value)||0;
+
+let p=parseFloat(row.querySelector('input[name="prix[]"]').value)||0;
+
+let t=q*p;
+
+row.querySelector(".ligneTotal").innerHTML=t.toFixed(2)+" €";
+
+total+=t;
+
+});
+
+document.getElementById("grandTotal").innerHTML=total.toFixed(2)+" €";
+
+}
+
+ajouterLigne();
+
+let clients = [];
+
+fetch("/api/clients")
+.then(r=>r.json())
+.then(data=>{
+
+    clients=data;
+
+});
+
+
+document.getElementById("nom").addEventListener("input",function(){
+
+    let valeur=this.value.toLowerCase();
+
+    let div=document.getElementById("suggestions");
+
+    div.innerHTML="";
+
+    if(valeur.length<2)
+        return;
+
+    clients.forEach(function(c){
+
+        if(c.nom.toLowerCase().includes(valeur)){
+
+            let ligne=document.createElement("div");
+
+            ligne.className="suggestion";
+
+            ligne.innerHTML=c.nom;
+
+            ligne.onclick=function(){
+
+                document.getElementById("nom").value=c.nom;
+
+                document.getElementById("adresse").value=c.adresse;
+
+                document.getElementById("cp").value=c.cp;
+
+                document.getElementById("ville").value=c.ville;
+
+                document.getElementById("telephone").value=c.telephone;
+
+                document.getElementById("mail").value=c.email;
+
+                div.innerHTML="";
+
+            };
+
+            div.appendChild(ligne);
+
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+
+</html>

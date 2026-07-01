@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block contenu %}
+
+<h1>Aperçu du devis</h1>
+
+<div class="bloc">
+
+<h2>{{ devis.numero }}</h2>
+
+<p><b>Date :</b> {{ devis.date }}</p>
+
+<p><b>Client :</b> {{ devis.client_obj.nom }}</p>
+
+<p><b>Adresse :</b> {{ devis.client_obj.adresse }}</p>
+
+<p>
+{{ devis.client_obj.code_postal }}
+{{ devis.client_obj.ville }}
+</p>
+
+<br>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Désignation</th>
+
+<th>Unité</th>
+
+<th>Qté</th>
+
+<th>PU</th>
+
+<th>Total</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for ligne in devis.lignes %}
+
+<tr>
+
+<td>{{ ligne.designation }}</td>
+
+<td>{{ ligne.unite }}</td>
+
+<td>{{ ligne.quantite }}</td>
+
+<td>{{ "%.2f"|format(ligne.prix) }} €</td>
+
+<td>{{ "%.2f"|format(ligne.total) }} €</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+<h2 style="text-align:right">
+
+Total :
+
+{{ "%.2f"|format(devis.total) }} €
+
+</h2>
+
+<br>
+
+<a href="/pdf/{{ devis.id }}">
+
+<button class="valider">
+
+📄 Télécharger le PDF
+
+</button>
+
+</a>
+
+</div>
+
+{% endblock %}

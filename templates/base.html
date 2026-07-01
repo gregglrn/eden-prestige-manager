@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Eden Prestige Paysage</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>🌿 EDEN PRESTIGE</h2>
+
+    <a href="/">📄 Nouveau devis</a>
+
+    <a href="/clients">👤 Clients</a>
+
+    <a href="/historique">📜 Historique</a>
+
+    <a href="#">⚙ Paramètres</a>
+
+</div>
+
+<div class="content">
+
+{% block contenu %}
+
+{% endblock %}
+
+</div>
+
+</body>
+
+</html>

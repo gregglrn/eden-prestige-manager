@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block contenu %}
+
+<h1>Historique des devis</h1>
+
+<div class="bloc">
+
+<table>
+
+<tr>
+
+<th>Numéro</th>
+
+<th>Client</th>
+
+<th>Total</th>
+
+<th>Date</th>
+
+</tr>
+
+{% for d in devis %}
+
+<tr>
+
+<td>{{ d.numero }}</td>
+
+<td>{{ d.client_obj.nom }}</td>
+
+<td>{{ "%.2f"|format(d.total) }} €</td>
+
+<td>{{ d.date }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endblock %}
