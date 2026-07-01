@@ -68,3 +68,18 @@ class LigneDevis(db.Model):
         db.Integer,
         db.ForeignKey("devis.id")
     )
+
+
+class Prestation(db.Model):
+    __tablename__ = "prestations"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    designation = db.Column(db.String(150), nullable=False)
+
+    unite = db.Column(db.String(50))
+
+    prix = db.Column(db.Float)
+
+    def __repr__(self):
+        return f"<Prestation {self.designation}>"

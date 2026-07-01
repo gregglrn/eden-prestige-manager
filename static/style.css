@@ -183,3 +183,35 @@ background:#d5b15a;
 color:white;
 
 }
+
+.totaux{
+
+margin-top:30px;
+
+width:350px;
+
+margin-left:auto;
+
+}
+
+.totaux div{
+
+display:flex;
+
+justify-content:space-between;
+
+margin:12px 0;
+
+font-size:18px;
+
+}
+
+.grandTotal{
+
+font-size:24px;
+
+font-weight:bold;
+
+color:#b58d2e;
+
+}

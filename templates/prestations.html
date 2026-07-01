@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block contenu %}
+
+<h1>Catalogue des prestations</h1>
+
+<div class="bloc">
+
+<form action="/ajouter_prestation" method="POST">
+
+<label>Désignation</label>
+
+<input name="designation">
+
+<label>Unité</label>
+
+<input name="unite">
+
+<label>Prix</label>
+
+<input
+type="number"
+step="0.01"
+name="prix">
+
+<br><br>
+
+<input
+class="valider"
+type="submit"
+value="Ajouter">
+
+</form>
+
+</div>
+
+<br>
+
+<div class="bloc">
+
+<table>
+
+<tr>
+
+<th>Désignation</th>
+
+<th>Unité</th>
+
+<th>Prix</th>
+
+</tr>
+
+{% for p in prestations %}
+
+<tr>
+
+<td>{{p.designation}}</td>
+
+<td>{{p.unite}}</td>
+
+<td>{{"%.2f"|format(p.prix)}} €</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endblock %}

@@ -84,6 +84,46 @@ href="{{ url_for('static', filename='style.css') }}">
 
 </table>
 
+<div class="totaux">
+
+    <div>
+
+        Sous-total
+
+        <span id="sousTotal">
+
+            0.00 €
+
+        </span>
+
+    </div>
+
+    <div>
+
+        Remise
+
+        <input
+            id="remise"
+            type="number"
+            value="0"
+            step="0.01">
+
+    </div>
+
+    <div class="grandTotal">
+
+        Total
+
+        <span id="grandTotal">
+
+            0.00 €
+
+        </span>
+
+    </div>
+
+</div>
+
 <br>
 
 <button
@@ -121,25 +161,83 @@ value="Créer le devis">
 
 <script>
 
+    let catalogue = [];
+
+fetch("/api/prestations")
+    .then(r => r.json())
+    .then(data => {
+        catalogue = data;
+    });
+
 let tbody = document.querySelector("#prestations tbody");
 
 function ajouterLigne(){
 
 let ligne=document.createElement("tr");
 
-ligne.innerHTML=`
+ligne.innerHTML = `
 
-<td><input name="designation[]"></td>
+<td>
 
-<td><input name="unite[]"></td>
+<select class="prestationSelect" onchange="selectionPrestation(this)">
 
-<td><input type="number" value="1" name="quantite[]" oninput="calculer()"></td>
+<option value="">-- Choisir --</option>
 
-<td><input type="number" value="0" step="0.01" name="prix[]" oninput="calculer()"></td>
+${catalogue.map((p,index)=>`
+<option value="${index}">
+${p.designation}
+</option>
+`).join("")}
 
-<td class="ligneTotal">0.00 €</td>
+</select>
 
-<td><button type="button" onclick="supprimer(this)">❌</button></td>
+</td>
+
+<td>
+
+<input name="unite[]" readonly>
+
+</td>
+
+<td>
+
+<input
+type="number"
+name="quantite[]"
+value="1"
+min="1"
+oninput="calculer()">
+
+</td>
+
+<td>
+
+<input
+type="number"
+name="prix[]"
+step="0.01"
+value="0"
+oninput="calculer()">
+
+</td>
+
+<td class="ligneTotal">
+
+0.00 €
+
+</td>
+
+<td>
+
+<button
+type="button"
+onclick="supprimer(this)">
+
+❌
+
+</button>
+
+</td>
 
 `;
 
@@ -167,17 +265,35 @@ let q=parseFloat(row.querySelector('input[name="quantite[]"]').value)||0;
 
 let p=parseFloat(row.querySelector('input[name="prix[]"]').value)||0;
 
-let t=q*p;
+let ligne=q*p;
 
-row.querySelector(".ligneTotal").innerHTML=t.toFixed(2)+" €";
+row.querySelector(".ligneTotal").innerHTML=
 
-total+=t;
+ligne.toFixed(2)+" €";
+
+total+=ligne;
 
 });
 
-document.getElementById("grandTotal").innerHTML=total.toFixed(2)+" €";
+document.getElementById("sousTotal").innerHTML=
+
+total.toFixed(2)+" €";
+
+let remise=parseFloat(
+
+document.getElementById("remise").value
+
+)||0;
+
+document.getElementById("grandTotal").innerHTML=
+
+(total-remise).toFixed(2)+" €";
 
 }
+
+document
+.getElementById("remise")
+.addEventListener("input",calculer);
 
 ajouterLigne();
 
@@ -190,6 +306,25 @@ fetch("/api/clients")
     clients=data;
 
 });
+
+function selectionPrestation(select){
+
+    let prestation = catalogue[select.value];
+
+    if(!prestation)
+        return;
+
+    let ligne = select.closest("tr");
+
+    ligne.querySelector('input[name="unite[]"]').value =
+        prestation.unite;
+
+    ligne.querySelector('input[name="prix[]"]').value =
+        prestation.prix;
+
+    calculer();
+
+}
 
 
 document.getElementById("nom").addEventListener("input",function(){

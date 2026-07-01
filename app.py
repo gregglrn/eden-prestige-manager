@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_file
 from flask import render_template
 from flask import request
 from models import Client
@@ -10,6 +10,8 @@ from database import db
 from datetime import datetime
 from models import Client, Devis, LigneDevis
 from flask import redirect
+from pdf_generator import PDFGenerator
+from models import Prestation
 
 app = Flask(__name__)
 
@@ -201,6 +203,66 @@ def voir_devis(id):
         "apercu.html",
         devis=devis
     )
+
+@app.route("/pdf/<int:id>")
+def pdf(id):
+
+    devis = Devis.query.get_or_404(id)
+
+    chemin = PDFGenerator.generer(devis)
+
+    return send_file (
+        chemin,
+        as_attachment=False
+    )
+
+@app.route("/prestations")
+def prestations():
+
+    prestations = Prestation.query.order_by(
+        Prestation.designation
+    ).all()
+
+    return render_template(
+        "prestations.html",
+        prestations=prestations
+    )
+
+@app.route("/ajouter_prestation",methods=["POST"])
+def ajouter_prestation():
+
+    prestation = Prestation(
+
+        designation=request.form["designation"],
+
+        unite=request.form["unite"],
+
+        prix=float(request.form["prix"])
+
+    )
+
+    db.session.add(prestation)
+
+    db.session.commit()
+
+    return redirect("/prestations")
+
+@app.route("/api/prestations")
+def api_prestations():
+
+    prestations = Prestation.query.order_by(
+        Prestation.designation
+    ).all()
+
+    return jsonify([
+        {
+            "id": p.id,
+            "designation": p.designation,
+            "unite": p.unite,
+            "prix": p.prix
+        }
+        for p in prestations
+    ])
 
 if __name__ == "__main__":
 
