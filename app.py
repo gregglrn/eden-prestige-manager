@@ -1,7 +1,6 @@
 from flask import Flask, send_file
 from flask import render_template
 from flask import request
-from models import Client
 from flask import redirect
 from flask import jsonify
 from models import Devis
@@ -9,7 +8,6 @@ from config import Config
 from database import db
 from datetime import datetime
 from models import Client, Devis, LigneDevis
-from flask import redirect
 from pdf_generator import PDFGenerator
 from models import Prestation
 
@@ -88,39 +86,27 @@ def devis():
     prestation_ids = request.form.getlist("prestation_id[]")
 
     for i in range(len(designations)):
-
         qte = float(quantites[i])
         pu = float(prix[i])
 
         prestation_id = None
-
-    if prestation_ids[i]:
-        prestation_id = int(prestation_ids[i])
+        if prestation_ids[i]:
+            prestation_id = int(prestation_ids[i])
 
         ligne = LigneDevis(
-
             designation=designations[i],
-
             unite=unites[i],
-
             quantite=qte,
-
             prix=pu,
-
             total=qte * pu,
-
             prestation_id=prestation_id,
-
             devis_id=devis.id
-
         )
 
         total += qte * pu
-
         db.session.add(ligne)
 
     devis.total = total
-
     db.session.commit()
 
     return redirect(f"/devis/{devis.id}")

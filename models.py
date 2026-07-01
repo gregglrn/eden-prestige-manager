@@ -75,7 +75,7 @@ class LigneDevis(db.Model):
     nullable=True
 )
 
-prestation = db.relationship("Prestation")
+    prestation = db.relationship("Prestation")
 
 
 class Prestation(db.Model):

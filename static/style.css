@@ -251,3 +251,45 @@ background:#c7a44b;
 color:white;
 
 }
+
+.prestation-container{
+
+position:relative;
+
+}
+
+.listePrestations{
+
+display:none;
+
+position:absolute;
+
+background:white;
+
+width:100%;
+
+border:1px solid #ddd;
+
+max-height:220px;
+
+overflow-y:auto;
+
+z-index:500;
+
+}
+
+.listePrestations div{
+
+padding:10px;
+
+cursor:pointer;
+
+}
+
+.listePrestations div:hover{
+
+background:#c7a44b;
+
+color:white;
+
+}
