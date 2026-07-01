@@ -6,6 +6,10 @@
 
 <h1>Nouveau devis</h1>
 
+<div class="page-devis">
+
+<div class="gauche">
+
 <form action="/devis" method="POST">
 
 <div class="bloc">
@@ -144,6 +148,73 @@ value="Créer le devis">
 
 </div>
 
+<div class="droite">
+
+<div id="apercu">
+
+    <div class="apercu-header">
+
+        <h2>EDEN PRESTIGE PAYSAGE</h2>
+
+        <h1>DEVIS</h1>
+
+    </div>
+
+    <hr>
+
+    <h3>Client</h3>
+
+    <p id="previewNom">Nom du client</p>
+
+    <p id="previewAdresse">Adresse</p>
+
+    <p>
+
+        <span id="previewCP">00000</span>
+
+        <span id="previewVille">Ville</span>
+
+    </p>
+
+    <br>
+
+    <table id="previewTable">
+
+        <thead>
+
+            <tr>
+
+                <th>Désignation</th>
+                <th>Qté</th>
+                <th>PU</th>
+                <th>Total</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        </tbody>
+
+    </table>
+
+    <br>
+
+    <h2 style="text-align:right">
+
+        Total :
+
+        <span id="previewTotal">
+
+            0.00 €
+
+        </span>
+
+    </h2>
+
+</div>
+
 <script>
 
     let catalogue = [];
@@ -157,6 +228,14 @@ fetch("/api/prestations")
         ajouterLigne();
 
     });
+
+["nom","adresse","cp","ville"].forEach(function(id){
+
+    document
+        .getElementById(id)
+        .addEventListener("input",mettreAJourClient);
+
+});
 
 let tbody = document.querySelector("#prestations tbody");
 
@@ -507,6 +586,22 @@ document
     liste.style.display = "block";
 
 });
+
+function mettreAJourClient(){
+
+    document.getElementById("previewNom").innerHTML =
+        document.getElementById("nom").value;
+
+    document.getElementById("previewAdresse").innerHTML =
+        document.getElementById("adresse").value;
+
+    document.getElementById("previewCP").innerHTML =
+        document.getElementById("cp").value;
+
+    document.getElementById("previewVille").innerHTML =
+        document.getElementById("ville").value;
+
+}
 
 </script>
 
