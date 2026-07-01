@@ -184,12 +184,16 @@ ligne.innerHTML = `
 <option value="">-- Choisir --</option>
 
 ${catalogue.map((p,index)=>`
-<option value="${index}">
+<option value="${p.id}">
 ${p.designation}
 </option>
 `).join("")}
 
 </select>
+
+<input
+    type="hidden"
+    name="prestation_id[]">
 
 </td>
 
@@ -309,12 +313,17 @@ fetch("/api/clients")
 
 function selectionPrestation(select){
 
-    let prestation = catalogue[select.value];
+    let id = parseInt(select.value);
+
+    let prestation = catalogue.find(p => p.id === id);
 
     if(!prestation)
         return;
 
     let ligne = select.closest("tr");
+
+    ligne.querySelector('input[name="prestation_id[]"]').value =
+        prestation.id;
 
     ligne.querySelector('input[name="unite[]"]').value =
         prestation.unite;
@@ -323,9 +332,7 @@ function selectionPrestation(select){
         prestation.prix;
 
     calculer();
-
 }
-
 
 document.getElementById("nom").addEventListener("input",function(){
 

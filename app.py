@@ -71,7 +71,7 @@ def devis():
 
         total=0,
 
-        client_id=client.id
+        client_id=client.id,
 
     )
 
@@ -85,11 +85,17 @@ def devis():
     unites = request.form.getlist("unite[]")
     quantites = request.form.getlist("quantite[]")
     prix = request.form.getlist("prix[]")
+    prestation_ids = request.form.getlist("prestation_id[]")
 
     for i in range(len(designations)):
 
         qte = float(quantites[i])
         pu = float(prix[i])
+
+        prestation_id = None
+
+    if prestation_ids[i]:
+        prestation_id = int(prestation_ids[i])
 
         ligne = LigneDevis(
 
@@ -102,6 +108,8 @@ def devis():
             prix=pu,
 
             total=qte * pu,
+
+            prestation_id=prestation_id,
 
             devis_id=devis.id
 

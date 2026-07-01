@@ -69,6 +69,14 @@ class LigneDevis(db.Model):
         db.ForeignKey("devis.id")
     )
 
+    prestation_id = db.Column(
+    db.Integer,
+    db.ForeignKey("prestations.id"),
+    nullable=True
+)
+
+prestation = db.relationship("Prestation")
+
 
 class Prestation(db.Model):
     __tablename__ = "prestations"
