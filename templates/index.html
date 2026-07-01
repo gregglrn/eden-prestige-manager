@@ -168,8 +168,6 @@ ligne.innerHTML = `
 
 <td>
 
-<td>
-
 <div class="prestation-container">
 
 <input
@@ -182,7 +180,9 @@ placeholder="Rechercher..."
 
 autocomplete="off"
 
-oninput="chercherPrestation(this)">
+oninput="chercherPrestation(this)"
+
+onkeydown="gererTouchesRecherche(event)">
 
 <input
 type="hidden"
@@ -339,7 +339,23 @@ function chercherPrestation(input){
 
         let div=document.createElement("div");
 
-        div.innerHTML=prestation.designation;
+        div.innerHTML = `
+
+        <strong>${prestation.designation}</strong>
+
+        <br>
+
+        <small>
+
+        ${prestation.unite}
+
+•
+
+        ${prestation.prix.toFixed(2)} €
+
+        </small>
+
+        `;
 
         div.onclick=function(){
 
@@ -358,6 +374,58 @@ function chercherPrestation(input){
     });
 
     liste.style.display="block";
+
+}
+
+function gererTouchesRecherche(e){
+
+    const liste = e.target.parentElement.querySelector(".listePrestations");
+
+    const items = liste.querySelectorAll("div");
+
+    if(items.length === 0) return;
+
+    let index = parseInt(liste.dataset.index || -1);
+
+    if(e.key === "ArrowDown"){
+
+        e.preventDefault();
+
+        index++;
+
+        if(index >= items.length)
+            index = 0;
+
+    }
+
+    if(e.key === "ArrowUp"){
+
+        e.preventDefault();
+
+        index--;
+
+        if(index < 0)
+            index = items.length-1;
+
+    }
+
+    items.forEach(i=>i.classList.remove("selection"));
+
+    if(index >=0){
+
+        items[index].classList.add("selection");
+
+        liste.dataset.index = index;
+
+    }
+
+    if(e.key==="Enter" && index>=0){
+
+        e.preventDefault();
+
+        items[index].click();
+
+    }
 
 }
 

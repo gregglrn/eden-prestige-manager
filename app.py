@@ -249,13 +249,14 @@ def api_prestations():
     ).all()
 
     return jsonify([
-        {
-            "id": p.id,
-            "designation": p.designation,
-            "unite": p.unite,
-            "prix": p.prix
-        }
-        for p in prestations
+    {
+        "id": p.id,
+        "designation": p.designation,
+        "unite": p.unite,
+        "prix": p.prix,
+        "texte": f"{p.designation} • {p.unite} • {p.prix:.2f} €"
+    }
+    for p in prestations
     ])
 
 if __name__ == "__main__":
