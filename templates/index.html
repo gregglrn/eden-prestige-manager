@@ -49,6 +49,21 @@
 <label>Email</label>
 <input id="mail" name="mail">
 
+<label>Date de validité</label>
+
+<input
+    type="date"
+    id="expiration"
+    name="expiration">
+
+<label>Objet</label>
+
+<input
+    type="text"
+    id="objet"
+    name="objet"
+    placeholder="Objet du devis">
+
 </div>
 
 <br>
@@ -152,31 +167,93 @@ value="Créer le devis">
 
 <div id="apercu">
 
-    <div class="apercu-header">
+<div class="devis">
 
-        <h2>EDEN PRESTIGE PAYSAGE</h2>
+    <div class="entete">
 
-        <h1>DEVIS</h1>
+        <div class="entreprise">
+
+{% if param.logo %}
+
+<img
+
+src="{{ url_for('static',filename='logos/'+param.logo) }}"
+
+style="height:90px;">
+
+{% endif %}
+
+            <h2>
+
+{{ param.entreprise }}
+
+</h2>
+
+<p>
+
+{{ param.adresse }}
+
+<br>
+
+{{ param.code_postal }} {{ param.ville }}
+
+<br>
+
+{{ param.telephone }}
+
+<br>
+
+{{ param.email }}
+
+</p>
+
+        </div>
+
+        <div class="titre">
+
+            <h1>DEVIS</h1>
+
+            <p>N° <span id="previewNumero">DEV-2026-0001</span></p>
+
+          <p>
+    Date :
+    <span id="previewDate"></span>
+</p>
+
+<p>
+    Valable jusqu'au :
+    <span id="previewExpiration"></span>
+</p>
+
+<p>
+    <strong id="previewObjet">
+        Objet du devis
+    </strong>
+</p>
+
+        </div>
 
     </div>
 
     <hr>
 
-    <h3>Client</h3>
+    <div class="bloc-client">
 
-    <p id="previewNom">Nom du client</p>
+        <h3>CLIENT</h3>
 
-    <p id="previewAdresse">Adresse</p>
+        <p id="previewNom"></p>
 
-    <p>
+        <p id="previewAdresse"></p>
 
-        <span id="previewCP">00000</span>
+        <p>
 
-        <span id="previewVille">Ville</span>
+            <span id="previewCP"></span>
 
-    </p>
+            <span id="previewVille"></span>
 
-    <br>
+        </p>
+
+    </div>
 
     <table id="previewTable">
 
@@ -185,9 +262,12 @@ value="Créer le devis">
             <tr>
 
                 <th>Désignation</th>
+
                 <th>Qté</th>
-                <th>PU</th>
-                <th>Total</th>
+
+                <th>PU HT</th>
+
+                <th>Total HT</th>
 
             </tr>
 
@@ -199,11 +279,9 @@ value="Créer le devis">
 
     </table>
 
-    <br>
+    <div class="total">
 
-    <h2 style="text-align:right">
-
-        Total :
+        TOTAL :
 
         <span id="previewTotal">
 
@@ -211,7 +289,9 @@ value="Créer le devis">
 
         </span>
 
-    </h2>
+    </div>
+
+</div>
 
 </div>
 
@@ -374,6 +454,56 @@ document.getElementById("remise").value
 document.getElementById("grandTotal").innerHTML=
 
 (total-remise).toFixed(2)+" €";
+
+mettreAJourPrestations();
+
+}
+
+function mettreAJourPrestations() {
+
+    const tbody = document.querySelector("#previewTable tbody");
+
+    tbody.innerHTML = "";
+
+    let total = 0;
+
+    document.querySelectorAll("#prestations tbody tr").forEach(function(row){
+
+        const designation =
+            row.querySelector(".prestationRecherche").value;
+
+        const qte =
+            parseFloat(
+                row.querySelector('input[name="quantite[]"]').value
+            ) || 0;
+
+        const prix =
+            parseFloat(
+                row.querySelector('input[name="prix[]"]').value
+            ) || 0;
+
+        const ligneTotal = qte * prix;
+
+        total += ligneTotal;
+
+        if(designation === "")
+            return;
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${designation}</td>
+            <td>${qte}</td>
+            <td>${prix.toFixed(2)} €</td>
+            <td>${ligneTotal.toFixed(2)} €</td>
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+    document.getElementById("previewTotal").innerHTML =
+        total.toFixed(2) + " €";
 
 }
 
@@ -602,6 +732,54 @@ function mettreAJourClient(){
         document.getElementById("ville").value;
 
 }
+
+function mettreDateDuJour(){
+
+    const aujourdHui = new Date();
+
+    const options = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    };
+
+    document.getElementById("previewDate").textContent =
+        aujourdHui.toLocaleDateString("fr-FR", options);
+
+}
+
+function mettreDate(){
+
+    let aujourdHui = new Date();
+
+    document.getElementById("previewDate").innerHTML =
+        aujourdHui.toLocaleDateString("fr-FR");
+
+}
+
+function mettreAJourInfosDevis(){
+
+
+    document.getElementById("previewExpiration").innerHTML =
+        document.getElementById("expiration").value;
+
+    document.getElementById("previewObjet").innerHTML =
+        document.getElementById("objet").value;
+
+}
+
+["expiration","objet"].forEach(function(id){
+
+    document
+        .getElementById(id)
+        .addEventListener("input", mettreAJourInfosDevis);
+
+});
+
+mettreAJourInfosDevis();
+
+mettreDate();
+mettreDateDuJour();
 
 </script>
 

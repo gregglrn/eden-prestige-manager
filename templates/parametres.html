@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block contenu %}
+
+<h1>Paramètres de l'entreprise</h1>
+
+<form
+    method="POST"
+    enctype="multipart/form-data">
+
+<label>Nom de l'entreprise</label>
+<input name="entreprise" value="{{ param.entreprise or '' }}">
+
+<label>Adresse</label>
+<input name="adresse" value="{{ param.adresse or '' }}">
+
+<label>Code postal</label>
+<input name="code_postal" value="{{ param.code_postal or '' }}">
+
+<label>Ville</label>
+<input name="ville" value="{{ param.ville or '' }}">
+
+<label>Téléphone</label>
+<input name="telephone" value="{{ param.telephone or '' }}">
+
+<label>Email</label>
+<input name="email" value="{{ param.email or '' }}">
+
+<label>SIRET</label>
+<input name="siret" value="{{ param.siret or '' }}">
+
+<label>TVA</label>
+<input name="tva" value="{{ param.tva or '' }}">
+
+<label>IBAN</label>
+<input name="iban" value="{{ param.iban or '' }}">
+
+<label>BIC</label>
+<input name="bic" value="{{ param.bic or '' }}">
+
+<label>Site internet</label>
+<input name="site" value="{{ param.site or '' }}">
+
+<label>Logo</label>
+<input
+    type="file"
+    name="logo">
+
+<br><br>
+
+<button class="valider">
+    Enregistrer
+</button>
+
+</form>
+
+{% endblock %}

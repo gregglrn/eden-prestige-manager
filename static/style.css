@@ -379,3 +379,87 @@ border:1px solid #ddd;
 padding:8px;
 
 }
+
+.devis{
+
+background:white;
+
+padding:40px;
+
+border:1px solid #ccc;
+
+font-family:Arial;
+
+}
+
+.entete{
+
+display:flex;
+
+justify-content:space-between;
+
+margin-bottom:30px;
+
+}
+
+.entreprise{
+
+width:55%;
+
+}
+
+.titre{
+
+text-align:right;
+
+}
+
+.bloc-client{
+
+margin:30px 0;
+
+padding:15px;
+
+border:1px solid #ddd;
+
+}
+
+.total{
+
+margin-top:25px;
+
+font-size:24px;
+
+font-weight:bold;
+
+text-align:right;
+
+}
+
+.devis table{
+
+margin-top:25px;
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+.devis th{
+
+background:#c7a44b;
+
+color:white;
+
+padding:8px;
+
+}
+
+.devis td{
+
+padding:8px;
+
+border:1px solid #ddd;
+
+}

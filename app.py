@@ -1,15 +1,18 @@
+import os
 from flask import Flask, send_file
 from flask import render_template
 from flask import request
 from flask import redirect
 from flask import jsonify
+from pytest import param
 from models import Devis
 from config import Config
 from database import db
 from datetime import datetime
 from models import Client, Devis, LigneDevis
 from pdf_generator import PDFGenerator
-from models import Prestation
+from models import Prestation, Parametres
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -115,7 +118,14 @@ def devis():
 
 def accueil():
 
-    return render_template("index.html")
+    param = Parametres.query.first()
+
+    return render_template(
+    "index.html",
+    clients=clients,
+    prestations=prestations,
+    param=param
+)
 
 @app.route("/clients")
 def clients():
@@ -258,6 +268,74 @@ def api_prestations():
     }
     for p in prestations
     ])
+
+@app.route("/parametres")
+def parametres():
+
+    param = Parametres.query.first()
+
+    if param is None:
+
+        param = Parametres()
+
+        db.session.add(param)
+
+        db.session.commit()
+
+    return render_template(
+        "parametres.html",
+        param=param
+    )
+
+@app.route("/parametres", methods=["POST"])
+def enregistrer_parametres():
+
+    param = Parametres.query.first()
+
+    if param is None:
+        param = Parametres()
+
+    param.entreprise = request.form["entreprise"]
+    param.adresse = request.form["adresse"]
+    param.code_postal = request.form["code_postal"]
+    param.ville = request.form["ville"]
+    param.telephone = request.form["telephone"]
+    param.email = request.form["email"]
+    param.siret = request.form["siret"]
+    param.tva = request.form["tva"]
+    param.iban = request.form["iban"]
+    param.bic = request.form["bic"]
+    param.site = request.form["site"]
+
+    db.session.add(param)
+
+    if "logo" in request.files:
+
+        logo = request.files["logo"]
+
+        if logo.filename != "":
+
+            filename = secure_filename(logo.filename)
+
+            logo.save(
+
+                os.path.join(
+
+                    "static",
+
+                    "logos",
+
+                    filename
+
+                )
+
+            )
+
+            param.logo = filename
+
+    db.session.commit()
+
+    return redirect("/parametres")
 
 if __name__ == "__main__":
 

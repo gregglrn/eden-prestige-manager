@@ -91,3 +91,26 @@ class Prestation(db.Model):
 
     def __repr__(self):
         return f"<Prestation {self.designation}>"
+
+class Parametres(db.Model):
+
+    __tablename__ = "parametres"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    entreprise = db.Column(db.String(150))
+    adresse = db.Column(db.String(255))
+    code_postal = db.Column(db.String(10))
+    ville = db.Column(db.String(100))
+    telephone = db.Column(db.String(30))
+    email = db.Column(db.String(150))
+
+    siret = db.Column(db.String(30))
+    tva = db.Column(db.String(30))
+
+    iban = db.Column(db.String(60))
+    bic = db.Column(db.String(30))
+
+    site = db.Column(db.String(150))
+
+    logo = db.Column(db.String(255))
