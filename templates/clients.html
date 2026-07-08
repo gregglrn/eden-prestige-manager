@@ -1,105 +1,42 @@
-<!DOCTYPE html>
-
-<html lang="fr">
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>Clients</title>
-
-<link rel="stylesheet"
-href="{{ url_for('static', filename='style.css') }}">
-
-</head>
-
-<body>
-
 {% extends "base.html" %}
 
 {% block contenu %}
-
-<div class="content">
-
 <h1>Clients</h1>
 
 <div class="bloc">
-
-<form action="/ajouter_client" method="POST">
-
-<input
-name="nom"
-placeholder="Nom">
-
-<input
-name="adresse"
-placeholder="Adresse">
-
-<input
-name="cp"
-placeholder="Code Postal">
-
-<input
-name="ville"
-placeholder="Ville">
-
-<input
-name="telephone"
-placeholder="Téléphone">
-
-<input
-name="email"
-placeholder="Email">
-
-<br><br>
-
-<input
-class="valider"
-type="submit"
-value="Ajouter">
-
-</form>
-
+    <form action="/ajouter_client" method="POST" class="form-stack">
+        <input name="nom" placeholder="Nom" required>
+        <input name="adresse" placeholder="Adresse">
+        <div class="form-grid">
+            <input name="cp" placeholder="Code postal">
+            <input name="ville" placeholder="Ville">
+        </div>
+        <div class="form-grid">
+            <input name="telephone" placeholder="T&eacute;l&eacute;phone">
+            <input name="email" placeholder="Email">
+        </div>
+        <input class="valider" type="submit" value="Ajouter">
+    </form>
 </div>
-
-<br>
 
 <div class="bloc">
-
-<table>
-
-<tr>
-
-<th>Nom</th>
-
-<th>Téléphone</th>
-
-<th>Email</th>
-
-</tr>
-
-{% for client in clients %}
-
-<tr>
-
-<td>{{client.nom}}</td>
-
-<td>{{client.telephone}}</td>
-
-<td>{{client.email}}</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>T&eacute;l&eacute;phone</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+                <tr>
+                    <td>{{ client.nom }}</td>
+                    <td>{{ client.telephone }}</td>
+                    <td>{{ client.email }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-
-</div>
-
 {% endblock %}
-
-</body>
-
-</html>

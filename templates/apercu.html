@@ -1,90 +1,48 @@
 {% extends "base.html" %}
 
 {% block contenu %}
-
-<h1>Aperçu du devis</h1>
+<h1>Aper&ccedil;u du devis</h1>
 
 <div class="bloc">
+    <div class="apercu-actions">
+        <div>
+            <h2>{{ devis.numero }}</h2>
+            <p><b>Date :</b> {{ devis.date }}</p>
+            {% if devis.expiration %}<p><b>Expiration :</b> {{ devis.expiration }}</p>{% endif %}
+            {% if devis.objet %}<p><b>Objet :</b> {{ devis.objet }}</p>{% endif %}
+        </div>
+        <a href="/pdf/{{ devis.id }}"><button class="valider">T&euro;l&euro;charger le PDF</button></a>
+    </div>
 
-<h2>{{ devis.numero }}</h2>
+    <h3>Client</h3>
+    <p>{{ devis.client_obj.nom }}</p>
+    <p>{{ devis.client_obj.adresse }}</p>
+    <p>{{ devis.client_obj.code_postal }} {{ devis.client_obj.ville }}</p>
 
-<p><b>Date :</b> {{ devis.date }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>D&eacute;signation</th>
+                <th>Unit&eacute;</th>
+                <th>Qt&eacute;</th>
+                <th>PU</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in devis.lignes %}
+                <tr>
+                    <td>{{ ligne.designation }}</td>
+                    <td>{{ ligne.unite }}</td>
+                    <td>{{ ligne.quantite }}</td>
+                    <td>{{ "%.2f"|format(ligne.prix) }} &euro;</td>
+                    <td>{{ "%.2f"|format(ligne.total) }} &euro;</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<p><b>Client :</b> {{ devis.client_obj.nom }}</p>
-
-<p><b>Adresse :</b> {{ devis.client_obj.adresse }}</p>
-
-<p>
-{{ devis.client_obj.code_postal }}
-{{ devis.client_obj.ville }}
-</p>
-
-<br>
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Désignation</th>
-
-<th>Unité</th>
-
-<th>Qté</th>
-
-<th>PU</th>
-
-<th>Total</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for ligne in devis.lignes %}
-
-<tr>
-
-<td>{{ ligne.designation }}</td>
-
-<td>{{ ligne.unite }}</td>
-
-<td>{{ ligne.quantite }}</td>
-
-<td>{{ "%.2f"|format(ligne.prix) }} €</td>
-
-<td>{{ "%.2f"|format(ligne.total) }} €</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-<h2 style="text-align:right">
-
-Total :
-
-{{ "%.2f"|format(devis.total) }} €
-
-</h2>
-
-<br>
-
-<a href="/pdf/{{ devis.id }}">
-
-<button class="valider">
-
-📄 Télécharger le PDF
-
-</button>
-
-</a>
-
+    {% if devis.remise %}<p class="total">Remise : {{ "%.2f"|format(devis.remise) }} &euro;</p>{% endif %}
+    <h2 class="total">Total : {{ "%.2f"|format(devis.total) }} &euro;</h2>
 </div>
-
 {% endblock %}

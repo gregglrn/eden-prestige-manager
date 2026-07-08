@@ -1,43 +1,34 @@
 {% extends "base.html" %}
 
 {% block contenu %}
-
 <h1>Historique des devis</h1>
 
 <div class="bloc">
-
-<table>
-
-<tr>
-
-<th>Numéro</th>
-
-<th>Client</th>
-
-<th>Total</th>
-
-<th>Date</th>
-
-</tr>
-
-{% for d in devis %}
-
-<tr>
-
-<td>{{ d.numero }}</td>
-
-<td>{{ d.client_obj.nom }}</td>
-
-<td>{{ "%.2f"|format(d.total) }} €</td>
-
-<td>{{ d.date }}</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
+    <table>
+        <thead>
+            <tr>
+                <th>Num&eacute;ro</th>
+                <th>Client</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in devis %}
+                <tr>
+                    <td>{{ d.numero }}</td>
+                    <td>{{ d.client_obj.nom }}</td>
+                    <td>{{ "%.2f"|format(d.total) }} &euro;</td>
+                    <td>{{ d.date }}</td>
+                    <td class="actions">
+                        <a href="/devis/{{ d.id }}" class="btn-action">Voir</a>
+                        <a href="/devis/{{ d.id }}/modifier" class="btn-action">Modifier</a>
+                        <a href="{{ url_for('supprimer_devis', id=d.id) }}" class="btn-action supprimer" onclick="return confirm('Supprimer ce devis &euro;')">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-
 {% endblock %}

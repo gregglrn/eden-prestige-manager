@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
     <meta charset="UTF-8">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eden Prestige Paysage</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
+    <aside class="sidebar">
+        <h2>EDEN PRESTIGE</h2>
+        <a href="/">Nouveau devis</a>
+        <a href="/clients">Clients</a>
+        <a href="/prestations">Prestations</a>
+        <a href="/historique">Historique</a>
+        <a href="/parametres">Param&egrave;tres</a>
+    </aside>
 
-<div class="sidebar">
-
-    <h2>🌿 EDEN PRESTIGE</h2>
-
-    <a href="/">📄 Nouveau devis</a>
-
-    <a href="/clients">👤 Clients</a>
-
-    <a href="/prestations">📦 Prestations </a>
-
-    <a href="/historique">📜 Historique</a>
-
-    <a href="/parametres">⚙ Paramètres</a>
-
-</div>
-
-<div class="content">
-
-{% block contenu %}
-
-{% endblock %}
-
-</div>
-
+    <main class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages">
+                    {% for categorie, message in messages %}
+                        <div class="message {{ categorie }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block contenu %}{% endblock %}
+    </main>
 </body>
-
 </html>

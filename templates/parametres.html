@@ -1,57 +1,70 @@
 {% extends "base.html" %}
 
 {% block contenu %}
+<h1>Param&egrave;tres de l'entreprise</h1>
 
-<h1>Paramètres de l'entreprise</h1>
+<div class="bloc">
+    <form method="POST" enctype="multipart/form-data" class="form-stack">
+        <label>Nom de l'entreprise</label>
+        <input name="entreprise" value="{{ param.entreprise or '' }}">
 
-<form
-    method="POST"
-    enctype="multipart/form-data">
+        <label>Adresse</label>
+        <input name="adresse" value="{{ param.adresse or '' }}">
 
-<label>Nom de l'entreprise</label>
-<input name="entreprise" value="{{ param.entreprise or '' }}">
+        <div class="form-grid">
+            <div>
+                <label>Code postal</label>
+                <input name="code_postal" value="{{ param.code_postal or '' }}">
+            </div>
+            <div>
+                <label>Ville</label>
+                <input name="ville" value="{{ param.ville or '' }}">
+            </div>
+        </div>
 
-<label>Adresse</label>
-<input name="adresse" value="{{ param.adresse or '' }}">
+        <div class="form-grid">
+            <div>
+                <label>T&eacute;l&eacute;phone</label>
+                <input name="telephone" value="{{ param.telephone or '' }}">
+            </div>
+            <div>
+                <label>Email</label>
+                <input name="email" value="{{ param.email or '' }}">
+            </div>
+        </div>
 
-<label>Code postal</label>
-<input name="code_postal" value="{{ param.code_postal or '' }}">
+        <div class="form-grid">
+            <div>
+                <label>SIRET</label>
+                <input name="siret" value="{{ param.siret or '' }}">
+            </div>
+            <div>
+                <label>TVA</label>
+                <input name="tva" value="{{ param.tva or '' }}">
+            </div>
+        </div>
 
-<label>Ville</label>
-<input name="ville" value="{{ param.ville or '' }}">
+        <div class="form-grid">
+            <div>
+                <label>IBAN</label>
+                <input name="iban" value="{{ param.iban or '' }}">
+            </div>
+            <div>
+                <label>BIC</label>
+                <input name="bic" value="{{ param.bic or '' }}">
+            </div>
+        </div>
 
-<label>Téléphone</label>
-<input name="telephone" value="{{ param.telephone or '' }}">
+        <label>Site internet</label>
+        <input name="site" value="{{ param.site or '' }}">
 
-<label>Email</label>
-<input name="email" value="{{ param.email or '' }}">
+        <label>Logo</label>
+        <input type="file" name="logo" accept=".png,.jpg,.jpeg,.webp,.svg">
+        {% if param.logo %}
+            <img class="logo-preview" src="{{ url_for('static', filename='logos/' + param.logo) }}" alt="Logo actuel">
+        {% endif %}
 
-<label>SIRET</label>
-<input name="siret" value="{{ param.siret or '' }}">
-
-<label>TVA</label>
-<input name="tva" value="{{ param.tva or '' }}">
-
-<label>IBAN</label>
-<input name="iban" value="{{ param.iban or '' }}">
-
-<label>BIC</label>
-<input name="bic" value="{{ param.bic or '' }}">
-
-<label>Site internet</label>
-<input name="site" value="{{ param.site or '' }}">
-
-<label>Logo</label>
-<input
-    type="file"
-    name="logo">
-
-<br><br>
-
-<button class="valider">
-    Enregistrer
-</button>
-
-</form>
-
+        <button class="valider">Enregistrer</button>
+    </form>
+</div>
 {% endblock %}

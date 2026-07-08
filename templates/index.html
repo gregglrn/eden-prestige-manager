@@ -1,787 +1,274 @@
 {% extends "base.html" %}
 
 {% block contenu %}
+<h1>{% if mode == "edition" %}Modifier le devis {{ devis.numero }}{% else %}Nouveau devis{% endif %}</h1>
 
-<div class="content">
+<form method="POST" action="{% if mode == 'edition' %}{{ url_for('mettre_a_jour_devis', id=devis.id) }}{% else %}{{ url_for('devis') }}{% endif %}">
+    <div class="page-devis">
+        <section class="gauche">
+            <div class="bloc">
+                <h2>Informations client</h2>
 
-<h1>Nouveau devis</h1>
+                <label>Nom</label>
+                <div class="position-relative">
+                    <input id="nom" name="nom" autocomplete="off" required value="{% if mode == 'edition' %}{{ devis.client_obj.nom }}{% endif %}">
+                    <div id="listeClients" class="liste-clients"></div>
+                </div>
 
-<div class="page-devis">
+                <label>Adresse</label>
+                <input id="adresse" name="adresse_client" value="{% if mode == 'edition' %}{{ devis.client_obj.adresse or '' }}{% endif %}">
 
-<div class="gauche">
+                <div class="form-grid">
+                    <div>
+                        <label>Code postal</label>
+                        <input id="cp" name="cp" value="{% if mode == 'edition' %}{{ devis.client_obj.code_postal or '' }}{% endif %}">
+                    </div>
+                    <div>
+                        <label>Ville</label>
+                        <input id="ville" name="ville" value="{% if mode == 'edition' %}{{ devis.client_obj.ville or '' }}{% endif %}">
+                    </div>
+                </div>
 
-<form action="/devis" method="POST">
+                <div class="form-grid">
+                    <div>
+                        <label>T&eacute;l&eacute;phone</label>
+                        <input id="telephone" name="telephone" value="{% if mode == 'edition' %}{{ devis.client_obj.telephone or '' }}{% endif %}">
+                    </div>
+                    <div>
+                        <label>Email</label>
+                        <input id="mail" name="mail" value="{% if mode == 'edition' %}{{ devis.client_obj.email or '' }}{% endif %}">
+                    </div>
+                </div>
 
-<div class="bloc">
+                <div class="form-grid">
+                    <div>
+                        <label>Date de validit&eacute;</label>
+                        <input type="date" id="expiration" name="expiration" value="{% if mode == 'edition' %}{{ devis.expiration or '' }}{% endif %}">
+                    </div>
+                    <div>
+                        <label>Objet</label>
+                        <input type="text" id="objet" name="objet" placeholder="Objet du devis" value="{% if mode == 'edition' %}{{ devis.objet or '' }}{% endif %}">
+                    </div>
+                </div>
+            </div>
 
-<h2>Informations client</h2>
+            <div class="bloc">
+                <h2>Prestations</h2>
+                <table id="prestations">
+                    <thead>
+                        <tr>
+                            <th>D&eacute;signation</th>
+                            <th>Unit&eacute;</th>
+                            <th>Qt&eacute;</th>
+                            <th>Prix</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
 
-<label>Nom</label>
-<div class="position-relative">
+                <div class="totaux">
+                    <div><span>Sous-total</span><strong id="sousTotal">0.00 &euro;</strong></div>
+                    <div>
+                        <span>Remise</span>
+                        <input id="remise" name="remise" type="number" value="{% if mode == 'edition' %}{{ devis.remise or 0 }}{% else %}0{% endif %}" step="0.01" min="0">
+                    </div>
+                    <div class="grandTotal"><span>Total</span><strong id="grandTotal">0.00 &euro;</strong></div>
+                </div>
 
-<input
-    id="nom"
-    name="nom"
-    autocomplete="off">
+                <button class="btn-secondaire" type="button" onclick="ajouterLigne()">Ajouter une ligne</button>
+            </div>
 
-<div
-    id="listeClients"
-    class="liste-clients">
+            <input class="valider" type="submit" value="{% if mode == 'edition' %}Enregistrer les modifications{% else %}Cr&eacute;er le devis{% endif %}">
+        </section>
 
-</div>
+        <aside class="droite">
+            <div id="apercu" class="devis-preview">
+                <div class="preview-header">
+                    <div>
+                        <div class="preview-logo">E</div>
+                        <h2>{{ param.entreprise or 'EDEN PRESTIGE PAYSAGE' }}</h2>
+                        <p>{{ param.telephone or '' }}<br>{{ param.email or '' }}</p>
+                    </div>
+                    <div class="preview-title">
+                        <h2>DEVIS</h2>
+                        <p>N&deg; <span id="previewNumero">{{ prochain_numero }}</span></p>
+                        <p>Date : <span id="previewDate"></span></p>
+                        <p>Expiration : <span id="previewExpiration"></span></p>
+                    </div>
+                </div>
 
-</div>
+                <div class="preview-client">
+                    <strong>CLIENT</strong>
+                    <p id="previewNom"></p>
+                    <p id="previewAdresse"></p>
+                    <p><span id="previewCP"></span> <span id="previewVille"></span></p>
+                    <p id="previewObjet"></p>
+                </div>
 
-<div id="suggestions"></div>
+                <table id="previewTable">
+                    <thead>
+                        <tr>
+                            <th>D&eacute;signation</th>
+                            <th>Qt&eacute;</th>
+                            <th>PU</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
 
-<label>Adresse</label>
-<input id="adresse" name="adresse_client">
-
-<label>Code postal</label>
-<input id="cp" name="cp">
-
-<label>Ville</label>
-<input id="ville" name="ville">
-
-<label>Téléphone</label>
-<input id="telephone" name="telephone">
-
-<label>Email</label>
-<input id="mail" name="mail">
-
-<label>Date de validité</label>
-
-<input
-    type="date"
-    id="expiration"
-    name="expiration">
-
-<label>Objet</label>
-
-<input
-    type="text"
-    id="objet"
-    name="objet"
-    placeholder="Objet du devis">
-
-</div>
-
-<br>
-
-<div class="bloc">
-
-<h2>Prestations</h2>
-
-<table id="prestations">
-
-<thead>
-
-<tr>
-
-<th>Désignation</th>
-
-<th>Unité</th>
-
-<th>Qté</th>
-
-<th>Prix</th>
-
-<th>Total</th>
-
-<th></th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-</tbody>
-
-</table>
-
-<div class="totaux">
-
-    <div>
-
-        Sous-total
-
-        <span id="sousTotal">
-
-            0.00 €
-
-        </span>
-
+                <div class="total">TOTAL : <span id="previewTotal">0.00 &euro;</span></div>
+            </div>
+        </aside>
     </div>
-
-    <div>
-
-        Remise
-
-        <input
-            id="remise"
-            type="number"
-            value="0"
-            step="0.01">
-
-    </div>
-
-    <div class="grandTotal">
-
-        Total
-
-        <span id="grandTotal">
-
-            0.00 €
-
-        </span>
-
-    </div>
-
-</div>
-
-<br>
-
-<button
-type="button"
-onclick="ajouterLigne()">
-
-➕ Ajouter une ligne
-
-</button>
-
-</div>
-
-<br>
-
-<input
-class="valider"
-type="submit"
-value="Créer le devis">
-
 </form>
 
-</div>
-
-<div class="droite">
-
-<div id="apercu">
-
-<div class="devis">
-
-    <div class="entete">
-
-        <div class="entreprise">
-
-{% if param.logo %}
-
-<img
-
-src="{{ url_for('static',filename='logos/'+param.logo) }}"
-
-style="height:90px;">
-
-{% endif %}
-
-            <h2>
-
-{{ param.entreprise }}
-
-</h2>
-
-<p>
-
-{{ param.adresse }}
-
-<br>
-
-{{ param.code_postal }} {{ param.ville }}
-
-<br>
-
-{{ param.telephone }}
-
-<br>
-
-{{ param.email }}
-
-</p>
-
-        </div>
-
-        <div class="titre">
-
-            <h1>DEVIS</h1>
-
-            <p>N° <span id="previewNumero">DEV-2026-0001</span></p>
-
-          <p>
-    Date :
-    <span id="previewDate"></span>
-</p>
-
-<p>
-    Valable jusqu'au :
-    <span id="previewExpiration"></span>
-</p>
-
-<p>
-    <strong id="previewObjet">
-        Objet du devis
-    </strong>
-</p>
-
-        </div>
-
-    </div>
-
-    <hr>
-
-    <div class="bloc-client">
-
-        <h3>CLIENT</h3>
-
-        <p id="previewNom"></p>
-
-        <p id="previewAdresse"></p>
-
-        <p>
-
-            <span id="previewCP"></span>
-
-            <span id="previewVille"></span>
-
-        </p>
-
-    </div>
-
-    <table id="previewTable">
-
-        <thead>
-
-            <tr>
-
-                <th>Désignation</th>
-
-                <th>Qté</th>
-
-                <th>PU HT</th>
-
-                <th>Total HT</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-        </tbody>
-
-    </table>
-
-    <div class="total">
-
-        TOTAL :
-
-        <span id="previewTotal">
-
-            0.00 €
-
-        </span>
-
-    </div>
-
-</div>
-
-</div>
-
 <script>
-
-    let catalogue = [];
-
-fetch("/api/prestations")
-    .then(r => r.json())
-    .then(data => {
-
-        catalogue = data;
-
-        ajouterLigne();
-
-    });
-
-["nom","adresse","cp","ville"].forEach(function(id){
-
-    document
-        .getElementById(id)
-        .addEventListener("input",mettreAJourClient);
-
-});
-
-let tbody = document.querySelector("#prestations tbody");
-
-function ajouterLigne(){
-
-let ligne=document.createElement("tr");
-
-ligne.innerHTML = `
-
-<td>
-
-<div class="prestation-container">
-
-<input
-
-type="text"
-
-class="prestationRecherche"
-
-placeholder="Rechercher..."
-
-autocomplete="off"
-
-oninput="chercherPrestation(this)"
-
-onkeydown="gererTouchesRecherche(event)">
-
-<input
-type="hidden"
-name="prestation_id[]">
-
-<div class="listePrestations"></div>
-
-</div>
-
-</td>
-
-<input
-    type="hidden"
-    name="prestation_id[]">
-
-</td>
-
-<td>
-
-<input name="unite[]" readonly>
-
-</td>
-
-<td>
-
-<input
-type="number"
-name="quantite[]"
-value="1"
-min="1"
-oninput="calculer()">
-
-</td>
-
-<td>
-
-<input
-type="number"
-name="prix[]"
-step="0.01"
-value="0"
-oninput="calculer()">
-
-</td>
-
-<td class="ligneTotal">
-
-0.00 €
-
-</td>
-
-<td>
-
-<button
-type="button"
-onclick="supprimer(this)">
-
-❌
-
-</button>
-
-</td>
-
-`;
-
-tbody.appendChild(ligne);
-
-calculer();
-
-}
-
-function supprimer(btn){
-
-btn.parentNode.parentNode.remove();
-
-calculer();
-
-}
-
-function calculer(){
-
-let total=0;
-
-document.querySelectorAll("#prestations tbody tr").forEach(function(row){
-
-let q=parseFloat(row.querySelector('input[name="quantite[]"]').value)||0;
-
-let p=parseFloat(row.querySelector('input[name="prix[]"]').value)||0;
-
-let ligne=q*p;
-
-row.querySelector(".ligneTotal").innerHTML=
-
-ligne.toFixed(2)+" €";
-
-total+=ligne;
-
-});
-
-document.getElementById("sousTotal").innerHTML=
-
-total.toFixed(2)+" €";
-
-let remise=parseFloat(
-
-document.getElementById("remise").value
-
-)||0;
-
-document.getElementById("grandTotal").innerHTML=
-
-(total-remise).toFixed(2)+" €";
-
-mettreAJourPrestations();
-
-}
-
-function mettreAJourPrestations() {
-
-    const tbody = document.querySelector("#previewTable tbody");
-
-    tbody.innerHTML = "";
-
-    let total = 0;
-
-    document.querySelectorAll("#prestations tbody tr").forEach(function(row){
-
-        const designation =
-            row.querySelector(".prestationRecherche").value;
-
-        const qte =
-            parseFloat(
-                row.querySelector('input[name="quantite[]"]').value
-            ) || 0;
-
-        const prix =
-            parseFloat(
-                row.querySelector('input[name="prix[]"]').value
-            ) || 0;
-
-        const ligneTotal = qte * prix;
-
-        total += ligneTotal;
-
-        if(designation === "")
-            return;
-
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${designation}</td>
-            <td>${qte}</td>
-            <td>${prix.toFixed(2)} €</td>
-            <td>${ligneTotal.toFixed(2)} €</td>
-        `;
-
-        tbody.appendChild(tr);
-
-    });
-
-    document.getElementById("previewTotal").innerHTML =
-        total.toFixed(2) + " €";
-
-}
-
-document
-.getElementById("remise")
-.addEventListener("input",calculer);
-
+const lignesData = {% if mode == 'edition' %}[
+    {% for ligne in devis.lignes %}
+    {
+        designation: {{ (ligne.designation or '')|tojson }},
+        unite: {{ (ligne.unite or '')|tojson }},
+        quantite: {{ ligne.quantite or 0 }},
+        prix: {{ ligne.prix or 0 }},
+        prestation_id: {{ ligne.prestation_id or 'null' }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+]{% else %}[]{% endif %};
+let catalogue = [];
 let clients = [];
-
-fetch("/api/clients")
-.then(r=>r.json())
-.then(data=>{
-
-    clients=data;
-
-});
-
-
-function chercherPrestation(input){
-
-    let texte = input.value.toLowerCase();
-
-    let liste = input.parentElement.querySelector(".listePrestations");
-
-    liste.innerHTML="";
-
-    if(texte.length<2){
-
-        liste.style.display="none";
-
-        return;
-
-    }
-
-    let resultat = catalogue.filter(p=>
-
-        p.designation.toLowerCase().includes(texte)
-
-    );
-
-    resultat.forEach(function(prestation){
-
-        let div=document.createElement("div");
-
-        div.innerHTML = `
-
-        <strong>${prestation.designation}</strong>
-
-        <br>
-
-        <small>
-
-        ${prestation.unite}
-
-•
-
-        ${prestation.prix.toFixed(2)} €
-
-        </small>
-
-        `;
-
-        div.onclick=function(){
-
-            choisirPrestation(
-
-                input,
-
-                prestation
-
-            );
-
-        };
-
-        liste.appendChild(div);
-
-    });
-
-    liste.style.display="block";
-
-}
-
-function gererTouchesRecherche(e){
-
-    const liste = e.target.parentElement.querySelector(".listePrestations");
-
-    const items = liste.querySelectorAll("div");
-
-    if(items.length === 0) return;
-
-    let index = parseInt(liste.dataset.index || -1);
-
-    if(e.key === "ArrowDown"){
-
-        e.preventDefault();
-
-        index++;
-
-        if(index >= items.length)
-            index = 0;
-
-    }
-
-    if(e.key === "ArrowUp"){
-
-        e.preventDefault();
-
-        index--;
-
-        if(index < 0)
-            index = items.length-1;
-
-    }
-
-    items.forEach(i=>i.classList.remove("selection"));
-
-    if(index >=0){
-
-        items[index].classList.add("selection");
-
-        liste.dataset.index = index;
-
-    }
-
-    if(e.key==="Enter" && index>=0){
-
-        e.preventDefault();
-
-        items[index].click();
-
-    }
-
-}
-
-function choisirPrestation(input,prestation){
-
-    let ligne=input.closest("tr");
-
-    input.value=prestation.designation;
-
-    ligne.querySelector('input[name="prestation_id[]"]').value=
-
-        prestation.id;
-
-    ligne.querySelector('input[name="unite[]"]').value=
-
-        prestation.unite;
-
-    ligne.querySelector('input[name="prix[]"]').value=
-
-        prestation.prix;
-
-    ligne.querySelector(".listePrestations").style.display="none";
-
+const tbody = document.querySelector("#prestations tbody");
+
+fetch("/api/prestations").then(response => response.json()).then(data => {
+    catalogue = data;
+    if (lignesData.length) lignesData.forEach(ajouterLigne); else ajouterLigne();
     calculer();
+});
+fetch("/api/clients").then(response => response.json()).then(data => { clients = data; });
 
+function formatEuro(valeur) { return `${valeur.toFixed(2)} EUR`; }
+
+function ajouterLigne(data = {}) {
+    const ligne = document.createElement("tr");
+    ligne.innerHTML = `
+        <td><div class="prestation-container"><input type="text" name="designation[]" class="prestationRecherche" placeholder="Rechercher..." autocomplete="off" value="${data.designation || ''}" oninput="chercherPrestation(this); calculer()" onkeydown="gererTouchesRecherche(event)"><input type="hidden" name="prestation_id[]" value="${data.prestation_id || ''}"><div class="listePrestations"></div></div></td>
+        <td><input name="unite[]" value="${data.unite || ''}"></td>
+        <td><input type="number" name="quantite[]" value="${data.quantite || 1}" min="0" step="0.01" oninput="calculer()"></td>
+        <td><input type="number" name="prix[]" step="0.01" value="${data.prix || 0}" min="0" oninput="calculer()"></td>
+        <td class="ligneTotal">0.00 EUR</td>
+        <td><button class="btn-icon" type="button" onclick="supprimer(this)" title="Supprimer">x</button></td>`;
+    tbody.appendChild(ligne);
+    calculer();
 }
-
-document
-.getElementById("nom")
-.addEventListener("input", function () {
-
-    const texte = this.value.toLowerCase();
-
-    const liste = document.getElementById("listeClients");
-
-    liste.innerHTML = "";
-
-    if (texte.length < 2) {
-
-        liste.style.display = "none";
-        return;
-
-    }
-
-    const resultat = clients.filter(c =>
-
-        c.nom.toLowerCase().includes(texte)
-
-    );
-
-    resultat.forEach(client => {
-
-        let div = document.createElement("div");
-
-        div.innerHTML = client.nom;
-
-        div.onclick = function(){
-
-            document.getElementById("nom").value = client.nom;
-
-            document.getElementById("adresse").value = client.adresse;
-
-            document.getElementById("cp").value = client.cp;
-
-            document.getElementById("ville").value = client.ville;
-
-            document.getElementById("telephone").value = client.telephone;
-
-            document.getElementById("mail").value = client.email;
-
-            liste.style.display = "none";
-
-        }
-
-        liste.appendChild(div);
-
+function supprimer(btn) { btn.closest("tr").remove(); if (!tbody.querySelector("tr")) ajouterLigne(); calculer(); }
+function calculer() {
+    let total = 0;
+    document.querySelectorAll("#prestations tbody tr").forEach(row => {
+        const quantite = parseFloat(row.querySelector('input[name="quantite[]"]').value) || 0;
+        const prix = parseFloat(row.querySelector('input[name="prix[]"]').value) || 0;
+        const ligne = quantite * prix;
+        row.querySelector(".ligneTotal").textContent = formatEuro(ligne);
+        total += ligne;
     });
-
-    liste.style.display = "block";
-
+    const remise = parseFloat(document.getElementById("remise").value) || 0;
+    document.getElementById("sousTotal").textContent = formatEuro(total);
+    document.getElementById("grandTotal").textContent = formatEuro(Math.max(total - remise, 0));
+    mettreAJourPrestations();
+}
+function mettreAJourPrestations() {
+    const previewBody = document.querySelector("#previewTable tbody");
+    previewBody.innerHTML = "";
+    let total = 0;
+    document.querySelectorAll("#prestations tbody tr").forEach(row => {
+        const designation = row.querySelector('input[name="designation[]"]').value;
+        const quantite = parseFloat(row.querySelector('input[name="quantite[]"]').value) || 0;
+        const prix = parseFloat(row.querySelector('input[name="prix[]"]').value) || 0;
+        const ligneTotal = quantite * prix;
+        total += ligneTotal;
+        if (!designation.trim()) return;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${designation}</td><td>${quantite}</td><td>${formatEuro(prix)}</td><td>${formatEuro(ligneTotal)}</td>`;
+        previewBody.appendChild(tr);
+    });
+    const remise = parseFloat(document.getElementById("remise").value) || 0;
+    document.getElementById("previewTotal").textContent = formatEuro(Math.max(total - remise, 0));
+}
+function chercherPrestation(input) {
+    const texte = input.value.toLowerCase();
+    const liste = input.parentElement.querySelector(".listePrestations");
+    liste.innerHTML = "";
+    liste.dataset.index = -1;
+    if (texte.length < 2) { liste.style.display = "none"; return; }
+    catalogue.filter(prestation => prestation.designation.toLowerCase().includes(texte)).slice(0, 8).forEach(prestation => {
+        const div = document.createElement("div");
+        div.innerHTML = `<strong>${prestation.designation}</strong><small>${prestation.unite} - ${formatEuro(prestation.prix)}</small>`;
+        div.onclick = () => choisirPrestation(input, prestation);
+        liste.appendChild(div);
+    });
+    liste.style.display = liste.children.length ? "block" : "none";
+}
+function gererTouchesRecherche(event) {
+    const liste = event.target.parentElement.querySelector(".listePrestations");
+    const items = liste.querySelectorAll("div");
+    if (!items.length) return;
+    let index = parseInt(liste.dataset.index || -1);
+    if (event.key === "ArrowDown") { event.preventDefault(); index = index + 1 >= items.length ? 0 : index + 1; }
+    else if (event.key === "ArrowUp") { event.preventDefault(); index = index - 1 < 0 ? items.length - 1 : index - 1; }
+    else if (event.key === "Enter" && index >= 0) { event.preventDefault(); items[index].click(); return; }
+    else return;
+    items.forEach(item => item.classList.remove("selection"));
+    items[index].classList.add("selection");
+    liste.dataset.index = index;
+}
+function choisirPrestation(input, prestation) {
+    const ligne = input.closest("tr");
+    input.value = prestation.designation;
+    ligne.querySelector('input[name="prestation_id[]"]').value = prestation.id;
+    ligne.querySelector('input[name="unite[]"]').value = prestation.unite;
+    ligne.querySelector('input[name="prix[]"]').value = prestation.prix;
+    ligne.querySelector(".listePrestations").style.display = "none";
+    calculer();
+}
+function mettreAJourClient() {
+    document.getElementById("previewNom").textContent = document.getElementById("nom").value;
+    document.getElementById("previewAdresse").textContent = document.getElementById("adresse").value;
+    document.getElementById("previewCP").textContent = document.getElementById("cp").value;
+    document.getElementById("previewVille").textContent = document.getElementById("ville").value;
+}
+function mettreAJourInfosDevis() {
+    document.getElementById("previewExpiration").textContent = document.getElementById("expiration").value;
+    document.getElementById("previewObjet").textContent = document.getElementById("objet").value;
+}
+document.getElementById("nom").addEventListener("input", function () {
+    mettreAJourClient();
+    const texte = this.value.toLowerCase();
+    const liste = document.getElementById("listeClients");
+    liste.innerHTML = "";
+    if (texte.length < 2) { liste.style.display = "none"; return; }
+    clients.filter(client => client.nom.toLowerCase().includes(texte)).slice(0, 8).forEach(client => {
+        const div = document.createElement("div");
+        div.textContent = client.nom;
+        div.onclick = () => {
+            document.getElementById("nom").value = client.nom;
+            document.getElementById("adresse").value = client.adresse;
+            document.getElementById("cp").value = client.cp;
+            document.getElementById("ville").value = client.ville;
+            document.getElementById("telephone").value = client.telephone;
+            document.getElementById("mail").value = client.email;
+            liste.style.display = "none";
+            mettreAJourClient();
+        };
+        liste.appendChild(div);
+    });
+    liste.style.display = liste.children.length ? "block" : "none";
 });
-
-function mettreAJourClient(){
-
-    document.getElementById("previewNom").innerHTML =
-        document.getElementById("nom").value;
-
-    document.getElementById("previewAdresse").innerHTML =
-        document.getElementById("adresse").value;
-
-    document.getElementById("previewCP").innerHTML =
-        document.getElementById("cp").value;
-
-    document.getElementById("previewVille").innerHTML =
-        document.getElementById("ville").value;
-
-}
-
-function mettreDateDuJour(){
-
-    const aujourdHui = new Date();
-
-    const options = {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-    };
-
-    document.getElementById("previewDate").textContent =
-        aujourdHui.toLocaleDateString("fr-FR", options);
-
-}
-
-function mettreDate(){
-
-    let aujourdHui = new Date();
-
-    document.getElementById("previewDate").innerHTML =
-        aujourdHui.toLocaleDateString("fr-FR");
-
-}
-
-function mettreAJourInfosDevis(){
-
-
-    document.getElementById("previewExpiration").innerHTML =
-        document.getElementById("expiration").value;
-
-    document.getElementById("previewObjet").innerHTML =
-        document.getElementById("objet").value;
-
-}
-
-["expiration","objet"].forEach(function(id){
-
-    document
-        .getElementById(id)
-        .addEventListener("input", mettreAJourInfosDevis);
-
-});
-
+["adresse", "cp", "ville"].forEach(id => document.getElementById(id).addEventListener("input", mettreAJourClient));
+["expiration", "objet"].forEach(id => document.getElementById(id).addEventListener("input", mettreAJourInfosDevis));
+document.getElementById("remise").addEventListener("input", calculer);
+document.getElementById("previewDate").textContent = new Date().toLocaleDateString("fr-FR");
+mettreAJourClient();
 mettreAJourInfosDevis();
-
-mettreDate();
-mettreDateDuJour();
-
 </script>
-
-
 {% endblock %}
